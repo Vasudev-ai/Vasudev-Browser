@@ -1,8 +1,20 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import {
-  Menu, Search, Mic, Settings, History, Download, Star, User, HelpCircle,
-  X, Plus
+  Menu,
+  Search,
+  Mic,
+  Settings,
+  History,
+  Download,
+  Star,
+  User,
+  HelpCircle,
+  X,
+  Plus,
 } from "lucide-react";
+
 
 // Modal component
 function ShortcutModal({ open, onClose, onSubmit }) {
@@ -28,11 +40,15 @@ function ShortcutModal({ open, onClose, onSubmit }) {
         >
           <X size={20} />
         </button>
-        <h2 className="text-lg font-semibold mb-4 text-slate-200">Add Shortcut</h2>
-        <form onSubmit={e => {
-          e.preventDefault();
-          onSubmit({ name, url });
-        }}>
+        <h2 className="text-lg font-semibold mb-4 text-slate-200">
+          Add Shortcut
+        </h2>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            onSubmit({ name, url });
+          }}
+        >
           <div className="mb-4">
             <label className="block mb-2 text-sm text-slate-400">Name</label>
             <input
@@ -40,18 +56,20 @@ function ShortcutModal({ open, onClose, onSubmit }) {
               required
               className="w-full bg-slate-700 text-white p-2 rounded outline-none"
               value={name}
-              onChange={e => setName(e.target.value)}
+              onChange={(e) => setName(e.target.value)}
               placeholder="Website Name"
             />
           </div>
           <div className="mb-4">
-            <label className="block mb-2 text-sm text-slate-400">Website Link</label>
+            <label className="block mb-2 text-sm text-slate-400">
+              Website Link
+            </label>
             <input
               type="url"
               required
               className="w-full bg-slate-700 text-white p-2 rounded outline-none"
               value={url}
-              onChange={e => setUrl(e.target.value)}
+              onChange={(e) => setUrl(e.target.value)}
               placeholder="https://example.com"
             />
           </div>
@@ -74,16 +92,8 @@ export default function MainPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
 
-  const [shortcuts, setShortcuts] = useState([
-    { name: "YouTube", url: "https://youtube.com", color: "bg-red-100" },
-    { name: "Gmail", url: "https://gmail.com", color: "bg-blue-100" },
-    { name: "Drive", url: "https://drive.google.com", color: "bg-green-100" },
-    { name: "Maps", url: "https://maps.google.com", color: "bg-yellow-100" },
-    { name: "News", url: "https://news.google.com", color: "bg-purple-100" },
-    { name: "Photos", url: "https://photos.google.com", color: "bg-pink-100" },
-    { name: "Calendar", url: "https://calendar.google.com", color: "bg-indigo-100" },
-    { name: "Translate", url: "https://translate.google.com", color: "bg-cyan-100" }
-  ]);
+  const [shortcuts, setShortcuts] = useState([]);
+  const navigate = useNavigate(); // FIX: Correctly call the useNavigate hook at the top level
 
   const sidebarItems = [
     { icon: History, label: "History", shortcut: "Ctrl+H" },
@@ -91,7 +101,7 @@ export default function MainPage() {
     { icon: Star, label: "Bookmarks", shortcut: "Ctrl+Shift+O" },
     { icon: Settings, label: "Settings" },
     { icon: User, label: "Profile" },
-    { icon: HelpCircle, label: "Help & Support" }
+    { icon: HelpCircle, label: "Help & Support" },
   ];
 
   const handleSearch = (e) => {
@@ -102,15 +112,17 @@ export default function MainPage() {
   };
 
   const handleAddShortcut = ({ name, url }) => {
-    setShortcuts([
-      ...shortcuts,
-      { name, url, color: "bg-slate-600" }
-    ]);
+    setShortcuts([...shortcuts, { name, url, color: "bg-slate-600" }]);
     setModalOpen(false);
   };
 
-  const handleDeleteShortcut = index => {
+  const handleDeleteShortcut = (index) => {
     setShortcuts(shortcuts.filter((_, i) => i !== index));
+  };
+
+  // FIX: Create a proper handler function for navigation
+  const handleUserPanelClick = () => {
+    navigate("/userpanel");
   };
 
   return (
@@ -123,21 +135,23 @@ export default function MainPage() {
       {/* Sidebar Overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 transition-opacity duration-300"
+          className="fixed inset-0  bg-black/50 backdrop-blur-sm z-40 transition-opacity duration-300"
           onClick={() => setSidebarOpen(false)}
         ></div>
       )}
       {/* Sidebar */}
-      <div className={`fixed left-0 top-0 h-full w-80 bg-slate-800/95 backdrop-blur-xl border-r border-slate-700/50 z-50 transform transition-transform duration-300 ease-out ${
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      }`}>
+      <div
+        className={`fixed left-0 top-0 h-full w-80 bg-slate-800/95 backdrop-blur-xl border-r border-slate-700/50 z-50 transform transition-transform duration-300 ease-out ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
         <div className="flex items-center justify-between p-6 border-b border-slate-700/50">
           <h2 className="text-xl font-semibold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
             Vasudev Browser
           </h2>
           <button
             onClick={() => setSidebarOpen(false)}
-            className="p-2 hover:bg-slate-700/50 rounded-lg transition-colors"
+            className="p-2 hover:cursor-pointer hover:bg-slate-700/50 rounded-lg transition-colors"
           >
             <X size={20} />
           </button>
@@ -149,8 +163,13 @@ export default function MainPage() {
               className="w-full flex items-center justify-between p-3 hover:bg-slate-700/50 rounded-lg transition-all duration-200 group"
             >
               <div className="flex items-center space-x-3">
-                <item.icon size={20} className="text-slate-400 group-hover:text-white transition-colors" />
-                <span className="text-slate-300 group-hover:text-white transition-colors">{item.label}</span>
+                <item.icon
+                  size={20}
+                  className=" text-slate-400 group-hover:text-white transition-colors"
+                />
+                <span className="text-slate-300 group-hover:text-white transition-colors">
+                  {item.label}
+                </span>
               </div>
               {item.shortcut && (
                 <span className="text-xs text-slate-500 bg-slate-700/50 px-2 py-1 rounded">
@@ -180,15 +199,16 @@ export default function MainPage() {
         <header className="flex items-center justify-between p-6">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="p-3 hover:bg-slate-700/30 rounded-lg transition-all duration-200 hover:scale-105"
+            className="p-3 hover:cursor-pointer hover:bg-slate-700/30 rounded-lg transition-all duration-200 hover:scale-105"
           >
             <Menu size={24} />
           </button>
           <div className="flex items-center space-x-4">
-            <button className="p-2 hover:bg-slate-700/30 rounded-lg transition-colors">
+            <button className="p-2 hover:cursor-pointer hover:bg-slate-700/30 rounded-lg transition-colors">
               <Settings size={20} />
             </button>
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+            {/* FIX: Use the handleUserPanelClick function here */}
+            <div onClick={handleUserPanelClick} className="hover:cursor-pointer w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
               <User size={16} />
             </div>
           </div>
@@ -197,7 +217,7 @@ export default function MainPage() {
         <main className="flex flex-col items-center justify-center min-h-[calc(100vh-120px)] px-6">
           {/* Logo */}
           <div className="mb-12">
-            <h1 className="text-7xl font-light tracking-tight bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent hover:scale-105 transition-transform duration-300 cursor-default">
+            <h1 className="text-7xl font-light tracking-tight bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent cursor-default">
               Vasudev
             </h1>
           </div>
@@ -211,12 +231,18 @@ export default function MainPage() {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleSearch(e)}
-                  placeholder="Search Google or type a URL"
+                  onKeyPress={(e) => e.key === "Enter" && handleSearch(e)}
+                  placeholder="Search or type a URL"
                   className="flex-1 bg-transparent outline-none text-white placeholder-slate-400"
                 />
-                <button onClick={handleSearch} className="ml-4 p-2 hover:bg-slate-700/50 rounded-full transition-colors">
-                  <Mic size={16} className="text-slate-400 hover:text-white transition-colors" />
+                <button
+                  onClick={handleSearch}
+                  className="ml-4 p-2 hover:bg-slate-700/50 rounded-full transition-colors"
+                >
+                  <Mic
+                    size={16}
+                    className="text-slate-400 hover:text-white transition-colors"
+                  />
                 </button>
               </div>
             </div>
@@ -254,8 +280,13 @@ export default function MainPage() {
             onClick={() => setModalOpen(true)}
             className="mt-8 flex cursor-pointer items-center space-x-2 px-6 py-3 bg-slate-800/30 hover:bg-slate-800/50 rounded-full border border-slate-700/50 hover:border-slate-600/50 transition-all duration-300 group"
           >
-            <Plus size={16} className="text-slate-400 group-hover:text-white transition-colors" />
-            <span className="text-slate-400 group-hover:text-white transition-colors">Add shortcut</span>
+            <Plus
+              size={16}
+              className="text-slate-400 group-hover:text-white transition-colors"
+            />
+            <span className="text-slate-400 group-hover:text-white transition-colors">
+              Add shortcut
+            </span>
           </button>
         </main>
       </div>
