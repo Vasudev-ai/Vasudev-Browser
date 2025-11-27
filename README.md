@@ -8,6 +8,20 @@
 
 ---
 
+## 📸 Screenshots
+
+<div align="center">
+  <img src="screenshots/home.png" alt="Ultimate Homepage" width="800" style="border-radius: 10px; margin-bottom: 20px;">
+  <p><i>The Ultimate Homepage with Particles & Glassmorphism</i></p>
+</div>
+
+<div align="center">
+  <img src="screenshots/browser.png" alt="Browser Interface" width="800" style="border-radius: 10px; margin-bottom: 20px;">
+  <p><i>Dynamic Theming & Smart Omnibox</i></p>
+</div>
+
+---
+
 ## ✨ Key Features
 
 ### 🎨 **Immersive UI & Design**
