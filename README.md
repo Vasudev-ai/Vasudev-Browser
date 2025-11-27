@@ -1,33 +1,92 @@
-# Vasudev Browser
+# 🌌 Vasudev Browser (Powered by Vasudev AI)
 
-A custom Chromium-based desktop browser built with Electron + React (Vite). It features a minimalist, futuristic UI with neon accents, a frameless window, and a rich offline homepage.
+![Vasudev AI Badge](https://img.shields.io/badge/Vasudev_AI-Powered-cyan?style=for-the-badge&logo=atom)
+![Electron](https://img.shields.io/badge/Electron-Built_With-blue?style=for-the-badge&logo=electron)
+![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 
-> **Status:** Active development (Phase 1 complete scaffolding + core UX).
+**Vasudev Browser** is a next-generation, premium web browser built with Electron. It combines futuristic aesthetics with intelligent functionality, featuring a dynamic UI that adapts to the web you browse.
 
 ---
 
 ## ✨ Key Features
 
-- **Minimalist UI**: A frameless window with a custom title bar and neon accents.
-- **Custom Tabs**: Tabs with favicons, titles, and a smooth neon underline to show the active tab.
-- **Rich Offline Homepage**: A unique, non-scrollable page with a "Matrix" dock, a search bar, and quick links.
-- **AI Assistant**: A Comet-like AI assistant powered by Gemini for persistent help, page grounding, and agentic actions (with permission).
+### 🎨 **Immersive UI & Design**
+*   **Glassmorphism Aesthetic**: Premium frosted glass effects across the interface.
+*   **Dynamic Theming**: The entire browser window (background, controls, address bar) adapts its color scheme to match the dominant color of the website you are visiting.
+*   **Smart Dark Mode**: Automatically adjusts text and icon contrast based on the page's brightness for optimal readability.
+*   **Frameless Design**: A clean, edge-to-edge experience with custom-styled window controls.
+
+### 🚀 **Next-Gen Functionality**
+*   **Smart Omnibox**:
+    *   **Clean URLs**: Hides `https://` and `www.` for a cleaner look (shows full URL on focus).
+    *   **Title First**: Displays the page title by default.
+    *   **Direct Search**: Type any query to search Google instantly.
+    *   **Rich Suggestions**: Dropdown with search predictions and history.
+*   **Ultimate Homepage**:
+    *   **Interactive Particles**: A constellation background that reacts to your mouse.
+    *   **Voice Search**: Integrated voice command functionality.
+    *   **Focus Mode**: One-click distraction-free mode.
+    *   **Speed Dial**: Quick access to your favorite sites (YouTube, GitHub, ChatGPT).
+    *   **Live Dashboard**: Real-time clock, weather widget, and dynamic greetings.
+    *   **Audio Feedback**: Sci-fi inspired sound effects for interactions.
+
+### 🛡️ **Security & Navigation**
+*   **Security Badge**: Visual indicator for secure (HTTPS) connections.
+*   **Smooth Navigation**: Custom Back, Forward, Reload, and Home controls.
+*   **Loading Progress**: Subtle, animated progress bar integrated into the address bar.
 
 ---
+
+## 🛠️ Installation
+
+Ensure you have [Node.js](https://nodejs.org/) installed on your system.
+
+1.  **Clone the Repository**
+    ```bash
+    git clone https://github.com/yourusername/vasudev-browser.git
+    cd vasudev-browser
+    ```
+
+2.  **Install Dependencies**
+    ```bash
+    npm install
+    ```
+
+3.  **Run the Browser**
+    ```bash
+    npm start
+    ```
+
+---
+
+## 🖥️ Usage
+
+*   **Navigation**: Use the top-left controls to navigate history or return Home.
+*   **Search**: Click the address bar or press `/` (on homepage) to start typing.
+*   **Focus Mode**: On the homepage, click the "Focus" button in the top-left to hide distractions.
+*   **Voice Search**: Click the microphone icon on the homepage search bar to speak your query.
+
+---
+
 ## 🤝 Contributing
-- We welcome contributions! Please keep the following in mind:
-- Follow the Aesthetic: Maintain the minimalist, futuristic neon UI style.
-- Review Your Code: If you use AI tools, please review and understand the code before pushing. Quality and clarity are more important than speed.
 
-## ⚡ Getting Started
+We welcome contributions from the community to make Vasudev Browser even better!
 
-### Prerequisites
+1.  **Fork the Project**
+2.  **Create your Feature Branch** (`git checkout -b feature/AmazingFeature`)
+3.  **Commit your Changes** (`git commit -m 'Add some AmazingFeature'`)
+4.  **Push to the Branch** (`git push origin feature/AmazingFeature`)
+5.  **Open a Pull Request**
 
-- Node.js 18+
-- npm 9+
+---
 
-### Install & Run
+## 📜 License
 
-```bash
-npm install
-npm run dev
+Distributed under the MIT License. See `LICENSE` for more information.
+
+---
+
+<div align="center">
+  <p>Built with ❤️ by <b>Vasudev AI</b></p>
+  <p><i>"Redefining the Web Experience"</i></p>
+</div>

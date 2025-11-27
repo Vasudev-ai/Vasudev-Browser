@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vasudev AI - Home</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@300;400;600&display=swap');
+
+        :root {
+            --primary: #4ff0ff;
+            --bg: #0a0e17;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(79, 240, 255, 0.2);
+            --text: #ffffff;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+        }
+
+        /* Particles Canvas */
+        #particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            position: absolute;
+            top: 20px;
+            width: 95%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .widget {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .widget:hover {
+            background: rgba(79, 240, 255, 0.1);
+            box-shadow: 0 0 15px rgba(79, 240, 255, 0.2);
+        }
+
+        /* Main Container */
+        .main-container {
+            z-index: 10;
+            text-align: center;
+            width: 100%;
+            max-width: 800px;
+            transition: opacity 0.5s ease;
+        }
+
+        /* Clock & Greeting */
+        .clock-container {
+            margin-bottom: 20px;
+        }
+
+        .time {
+            font-size: 5rem;
+            font-weight: 300;
+            letter-spacing: -2px;
+            line-height: 1;
+            text-shadow: 0 0 20px rgba(79, 240, 255, 0.2);
+        }
+
+        .greeting {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 5px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* Glitch Logo */
+        .logo {
+            font-family: 'Cinzel', serif;
+            font-size: 3.5rem;
+            color: var(--primary);
+            margin-bottom: 40px;
+            position: relative;
+            display: inline-block;
+            text-shadow: 0 0 10px rgba(79, 240, 255, 0.5);
+        }
+
+        .logo::before,
+        .logo::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg);
+        }
+
+        .logo::before {
+            left: 2px;
+            text-shadow: -1px 0 #ff00c1;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim 5s infinite linear alternate-reverse;
+        }
+
+        .logo::after {
+            left: -2px;
+            text-shadow: -1px 0 #00fff9;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim2 5s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim {
+            0% {
+                clip: rect(30px, 9999px, 10px, 0);
+            }
+
+            5% {
+                clip: rect(80px, 9999px, 90px, 0);
+            }
+
+            10% {
+                clip: rect(10px, 9999px, 40px, 0);
+            }
+
+            100% {
+                clip: rect(50px, 9999px, 60px, 0);
+            }
+        }
+
+        @keyframes glitch-anim2 {
+            0% {
+                clip: rect(10px, 9999px, 80px, 0);
+            }
+
+            5% {
+                clip: rect(60px, 9999px, 20px, 0);
+            }
+
+            10% {
+                clip: rect(90px, 9999px, 10px, 0);
+            }
+
+            100% {
+                clip: rect(30px, 9999px, 50px, 0);
+            }
+        }
+
+        /* Search Bar */
+        .search-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 18px 50px 18px 25px;
+            font-size: 1.1rem;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            color: white;
+            outline: none;
+            backdrop-filter: blur(15px);
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .search-bar:focus {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: var(--primary);
+            box-shadow: 0 0 25px rgba(79, 240, 255, 0.2);
+            transform: scale(1.01);
+        }
+
+        .mic-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .mic-icon:hover {
+            opacity: 1;
+            color: var(--primary);
+        }
+
+        .suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background: rgba(10, 14, 23, 0.95);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            margin-top: 10px;
+            overflow: hidden;
+            display: none;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            text-align: left;
+            z-index: 100;
+            /* Ensure it's above speed dial */
+        }
+
+        .suggestion-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            color: #ddd;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .suggestion-item:hover {
+            background: rgba(79, 240, 255, 0.1);
+            color: white;
+        }
+
+        /* Speed Dial */
+        .speed-dial {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            justify-content: center;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .dial-item {
+            background: var(--glass);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            backdrop-filter: blur(5px);
+        }
+
+        .dial-item:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .dial-icon {
+            width: 32px;
+            height: 32px;
+            fill: var(--primary);
+        }
+
+        .dial-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        /* Focus Mode */
+        body.focus-mode .top-bar,
+        body.focus-mode .clock-container,
+        body.focus-mode .logo,
+        body.focus-mode .speed-dial {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        body.focus-mode .main-container {
+            transform: scale(1.1);
+        }
+
+        /* Mic Animation */
+        .mic-active {
+            animation: pulse 1.5s infinite;
+            color: #ff4f4f;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: translateY(-50%) scale(1);
+            }
+
+            50% {
+                transform: translateY(-50%) scale(1.2);
+            }
+
+            100% {
+                transform: translateY(-50%) scale(1);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="particles"></canvas>
+
+    <div class="top-bar">
+        <div class="widget" id="focus-btn" onclick="toggleFocus()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+            <span>Focus</span>
+        </div>
+        <div class="widget" id="weather-widget">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17.5 19c0-1.7-1.3-3-3-3h-11c-1.7 0-3 1.3-3 3s1.3 3 3 3h11c1.7 0 3-1.3 3-3z"></path>
+                <path
+                    d="M17.5 16c2.5 0 4.5-2 4.5-4.5S19.5 7 17 7c-.5 0-1 .1-1.5.2C14.9 4.2 12.1 2 9 2 5.1 2 2 5.1 2 9c0 .6.1 1.1.2 1.6">
+                </path>
+            </svg>
+            <span id="weather-text">Loading...</span>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="clock-container">
+            <div class="time" id="clock">12:00</div>
+            <div class="greeting" id="greeting">Good Afternoon</div>
+        </div>
+
+        <div class="logo" data-text="VASUDEV AI">VASUDEV AI</div>
+
+        <div class="search-wrapper">
+            <input type="text" class="search-bar" id="search-input" placeholder="Search the web or type a URL..."
+                autocomplete="off">
+            <svg class="mic-icon" id="mic-btn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                <line x1="12" y1="19" x2="12" y2="23"></line>
+                <line x1="8" y1="23" x2="16" y2="23"></line>
+            </svg>
+            <div class="suggestions" id="suggestions-box"></div>
+        </div>
+
+        <div class="speed-dial">
+            <div class="dial-item" onclick="visit('https://youtube.com')">
+                <svg class="dial-icon" viewBox="0 0 24 24">
+                    <path
+                        d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                </svg>
+                <span class="dial-label">YouTube</span>
+            </div>
+            <div class="dial-item" onclick="visit('https://github.com')">
+                <svg class="dial-icon" viewBox="0 0 24 24">
+                    <path
+                        d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+                </svg>
+                <span class="dial-label">GitHub</span>
+            </div>
+            <div class="dial-item" onclick="visit('https://chatgpt.com')">
+                <svg class="dial-icon" viewBox="0 0 24 24">
+                    <path
+                        d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1686a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4944zm-9.6607-4.1254a4.4708 4.4708 0 0 1-.534-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1408-1.6464zM2.3408 7.8956a4.485 4.485 0 0 1 2.3655-1.9728V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1685a.0757.0757 0 0 1-.071 0l-4.8303-2.7865A4.504 4.504 0 0 1 2.3408 7.872zm16.5963 3.8558L13.1038 8.364 15.1195 7.2a.0757.0757 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6772a.79.79 0 0 0-.407-.667zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.7759.7759 0 0 0-.7854 0L9.409 9.2297V6.8974a.0662.0662 0 0 1 .0284-.0615l4.8303-2.7913a4.4944 4.4944 0 0 1 6.6802 4.66zM8.3065 12.863l-2.02-1.1638a.0804.0804 0 0 1-.038-.0567V6.0742a4.4992 4.4992 0 0 1 7.3757-3.4537l-.142.0805L8.704 5.459a.7948.7948 0 0 0-.3927.6813zm1.0976-2.3654l3.1028-1.7995 3.1028 1.7995v3.591l-3.1028 1.8043-3.1028-1.8043z" />
+                </svg>
+                <span class="dial-label">ChatGPT</span>
+            </div>
+            <div class="dial-item" onclick="visit('https://vasudev.online')">
+                <svg class="dial-icon" viewBox="0 0 24 24">
+                    <path
+                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
+                </svg>
+                <span class="dial-label">My Site</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Audio Feedback ---
+        const playSound = (type) => {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+
+            if (type === 'hover') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(400, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(600, ctx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.05, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.1);
+            } else if (type === 'click') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(800, ctx.currentTime);
+                gain.gain.setValueAtTime(0.05, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.1);
+            }
+        };
+
+        document.querySelectorAll('button, .widget, .dial-item, input').forEach(el => {
+            el.addEventListener('mouseenter', () => playSound('hover'));
+            el.addEventListener('click', () => playSound('click'));
+        });
+
+        // --- Particles ---
+        const canvas = document.getElementById('particles');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.vx = (Math.random() - 0.5) * 0.5;
+                this.vy = (Math.random() - 0.5) * 0.5;
+                this.size = Math.random() * 2;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+            }
+            draw() {
+                ctx.fillStyle = 'rgba(79, 240, 255, 0.5)';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < 100; i++) particles.push(new Particle());
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+                // Connect particles
+                particles.forEach(p2 => {
+                    const dx = p.x - p2.x;
+                    const dy = p.y - p2.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 100) {
+                        ctx.strokeStyle = `rgba(79, 240, 255, ${0.1 - dist / 1000})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.stroke();
+                    }
+                });
+            });
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // --- Clock & Greeting ---
+        function updateTime() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('clock').innerText = `${hours}:${minutes}`;
+
+            const hour = now.getHours();
+            let greet = 'Good Evening';
+            if (hour < 12) greet = 'Good Morning';
+            else if (hour < 18) greet = 'Good Afternoon';
+            document.getElementById('greeting').innerText = `${greet}, Vasudev`;
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        // --- Weather (Mock) ---
+        // In a real app, fetch from OpenMeteo based on IP
+        document.getElementById('weather-text').innerText = '24°C Clear';
+
+        // --- Search & Suggestions ---
+        const input = document.getElementById('search-input');
+        const suggestionsBox = document.getElementById('suggestions-box');
+
+        input.addEventListener('input', (e) => {
+            const val = e.target.value;
+            if (val.length > 0) {
+                suggestionsBox.style.display = 'block';
+                suggestionsBox.innerHTML = `
+                    <div class="suggestion-item" onclick="search('${val}')">🔍 Search Google for "${val}"</div>
+                    <div class="suggestion-item" onclick="visit('https://${val}.com')">🌐 Go to ${val}.com</div>
+                `;
+            } else {
+                suggestionsBox.style.display = 'none';
+            }
+        });
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') search(input.value);
+        });
+
+        function search(query) {
+            if (!query) return;
+            window.location.href = 'https://www.google.com/search?q=' + encodeURIComponent(query);
+        }
+
+        function visit(url) {
+            window.location.href = url;
+        }
+
+        // --- Voice Search ---
+        const micBtn = document.getElementById('mic-btn');
+        if ('webkitSpeechRecognition' in window) {
+            const recognition = new webkitSpeechRecognition();
+            recognition.continuous = false;
+            recognition.lang = 'en-US';
+
+            micBtn.addEventListener('click', () => {
+                recognition.start();
+                micBtn.classList.add('mic-active');
+            });
+
+            recognition.onresult = (event) => {
+                const text = event.results[0][0].transcript;
+                input.value = text;
+                search(text);
+                micBtn.classList.remove('mic-active');
+            };
+
+            recognition.onend = () => {
+                micBtn.classList.remove('mic-active');
+            };
+        } else {
+            micBtn.style.display = 'none';
+        }
+
+        // --- Focus Mode ---
+        function toggleFocus() {
+            document.body.classList.toggle('focus-mode');
+        }
+    </script>
+</body>
+
+</html>

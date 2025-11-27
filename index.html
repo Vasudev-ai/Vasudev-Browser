@@ -1,13 +1,697 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vasudev browser</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Vasudev Browser</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom, #6cdff6, #30d4fd);
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: sans-serif;
+            backdrop-filter: blur(20px);
+            overflow: hidden;
+            transition: background 1s ease;
+            user-select: none;
+            /* Prevent text selection on the UI */
+        }
+
+        #browser {
+            width: calc(100vw - 10px);
+            height: calc(100vh - 10px);
+            background-color: rgba(255, 255, 255, 0.61);
+            backdrop-filter: blur(20px);
+            border-radius: 10px;
+            /* Optional: adds a slight curve to corners */
+            position: relative;
+            /* Needed for absolute positioning of controls */
+            overflow: hidden;
+        }
+
+        .window-controls {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgb(255, 255, 255);
+            padding: 0 12px;
+            height: 30px;
+            align-items: center;
+            border-radius: 20px;
+            display: flex;
+            gap: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            -webkit-app-region: no-drag;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .window-controls:hover {
+            opacity: 1;
+        }
+
+        .control-btn {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.1s ease;
+        }
+
+        .control-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .maximize {
+            background-color: #28c840;
+        }
+
+        /* Green */
+        .minimize {
+            background-color: #ffbd2e;
+        }
+
+        /* Yellow */
+        .close {
+            background-color: #ff5f57;
+        }
+
+        /* Red */
+
+        .address-bar {
+            position: absolute;
+            top: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            padding: 0 8px 0 8px;
+            /* Adjusted padding */
+            height: 36px;
+            /* Slightly taller for better touch target */
+            border-radius: 18px;
+            /* Perfectly rounded pill */
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            z-index: 1000;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            width: 30%;
+            min-width: 280px;
+        }
+
+        .address-bar:hover,
+        .address-bar:focus-within {
+            opacity: 1;
+            transform: translateX(-50%) translateY(2px);
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.2);
+            border-color: rgba(255, 255, 255, 0.8);
+            width: 40%;
+            /* Expand width on focus/hover */
+        }
+
+        .site-indicator {
+            width: 20px;
+            /* Slightly smaller for elegance */
+            height: 20px;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .url-text {
+            flex-grow: 1;
+            text-align: center;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-color, #333);
+            border: none;
+            background: transparent;
+            outline: none;
+            letter-spacing: 0.3px;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+            line-height: 36px;
+            /* Match container height to prevent cutting */
+            -webkit-app-region: no-drag;
+            /* Allow interaction */
+            user-select: text;
+            /* Allow text selection inside input */
+            cursor: text;
+        }
+
+        .search-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .search-icon svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Overlay */
+        #overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(0px);
+            -webkit-backdrop-filter: blur(0px);
+            z-index: 900;
+            /* Below address bar (1000) */
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease, backdrop-filter 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        #overlay.active {
+            opacity: 1;
+            backdrop-filter: blur(15px) saturate(120%);
+            -webkit-backdrop-filter: blur(15px) saturate(120%);
+            pointer-events: all;
+        }
+
+        /* Progress Bar */
+        .progress-bar-container {
+            position: absolute;
+            bottom: 0;
+            left: 18px;
+            /* Match border radius roughly */
+            right: 18px;
+            height: 2px;
+            overflow: hidden;
+            border-radius: 2px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: #2196f3;
+            width: 0%;
+            transition: width 0.2s ease;
+            box-shadow: 0 0 4px #2196f3;
+        }
+
+        /* Security Badge */
+        .security-badge {
+            width: 14px;
+            height: 14px;
+            color: #4caf50;
+            display: none;
+            /* Hidden by default */
+            margin-right: -4px;
+        }
+
+        /* Suggestions Dropdown */
+        .suggestions-dropdown {
+            position: absolute;
+            top: 45px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40%;
+            /* Match expanded address bar */
+            background: var(--dropdown-bg, #ffffff);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-radius: 16px;
+            padding: 12px 0;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color, rgba(255, 255, 255, 0.2));
+            z-index: 999;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .suggestion-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-color, #333);
+            transition: background 0.2s;
+        }
+
+        .suggestion-item:hover {
+            background: var(--hover-bg, rgba(0, 0, 0, 0.05));
+        }
+
+        .suggestion-icon {
+            width: 16px;
+            height: 16px;
+            color: var(--icon-color, #666);
+        }
+
+        .nav-controls {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            background: var(--glass-bg, rgba(255, 255, 255, 0.616));
+            padding: 0 12px;
+            height: 30px;
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            -webkit-app-region: no-drag;
+            /* Ensure buttons are clickable */
+        }
+
+        .nav-controls:hover {
+            opacity: 1;
+        }
+
+        .nav-circle {
+            width: 18px;
+            height: 18px;
+            background-color: #d1d1d1;
+            border-radius: 50%;
+        }
+
+        .nav-btn {
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #333;
+        }
+
+        .nav-btn:hover {
+            color: #000;
+        }
+
+        .nav-btn svg {
+            width: 100%;
+            height: 100%;
+            stroke-width: 2.5;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="browser">
+        <div id="overlay"></div>
+        <webview id="view" src="home.html" style="width:100%; height:100%; border:none;"></webview>
+
+        <div class="nav-controls">
+            <div class="nav-circle"></div>
+            <div class="nav-btn" id="home-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+            </div>
+            <div class="nav-btn" id="back-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+            </div>
+            <div class="nav-btn" id="forward-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+            </div>
+            <div class="nav-btn" id="reload-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M23 4v6h-6"></path>
+                    <path d="M1 20v-6h6"></path>
+                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                </svg>
+            </div>
+        </div>
+
+        <div class="address-bar" id="address-bar-container" style="-webkit-app-region: no-drag;">
+            <img class="site-indicator" id="favicon-img"
+                src="https://www.google.com/s2/favicons?domain=vasudev.online&sz=64">
+            <div class="security-badge" id="security-badge">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                        d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z" />
+                </svg>
+            </div>
+            <input type="text" class="url-text" id="url-input" value="vasudev.online">
+            <div class="search-icon" id="search-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+            </div>
+            <div class="progress-bar-container" id="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+        </div>
+
+        <div class="suggestions-dropdown" id="suggestions">
+            <!-- Populated by JS -->
+        </div>
+
+        <div class="window-controls">
+            <div class="control-btn maximize" id="maximize-btn"></div>
+            <div class="control-btn minimize" id="minimize-btn"></div>
+            <div class="control-btn close" id="close-btn"></div>
+        </div>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+        const view = document.getElementById('view');
+        const urlInput = document.getElementById('url-input');
+        const addressBar = document.getElementById('address-bar-container');
+        const navControls = document.querySelector('.nav-controls');
+        const winControls = document.querySelector('.window-controls');
+        const overlay = document.getElementById('overlay');
+        const suggestions = document.getElementById('suggestions');
+        const progressBar = document.getElementById('progress-bar');
+        const progressContainer = document.getElementById('progress-container');
+        const securityBadge = document.getElementById('security-badge');
+        const homeBtn = document.getElementById('home-btn');
+        const backBtn = document.getElementById('back-btn');
+        const forwardBtn = document.getElementById('forward-btn');
+        const reloadBtn = document.getElementById('reload-btn');
+        const searchBtn = document.getElementById('search-btn');
+
+        let currentFullUrl = 'home.html';
+        let currentTitle = 'New Tab';
+
+        // Smart URL Formatting
+        const formatUrl = (url) => {
+            try {
+                if (url.endsWith('home.html')) return 'New Tab';
+
+                const urlObj = new URL(url);
+                // Hide https:// and www.
+                let display = urlObj.hostname + urlObj.pathname + urlObj.search;
+                if (display.startsWith('www.')) display = display.substring(4);
+                if (display.endsWith('/')) display = display.slice(0, -1);
+                return display;
+            } catch (e) {
+                return url;
+            }
+        };
+
+        // Window Controls
+        document.getElementById('minimize-btn').addEventListener('click', () => {
+            ipcRenderer.send('minimize-window');
+        });
+
+        document.getElementById('maximize-btn').addEventListener('click', () => {
+            ipcRenderer.send('maximize-window');
+        });
+
+        document.getElementById('close-btn').addEventListener('click', () => {
+            ipcRenderer.send('close-window');
+        });
+
+        // Browser Navigation Logic
+
+        // Load URL function
+        const loadUrl = (input) => {
+            let url = input.trim();
+
+            // Check if it's a search query (no dots or contains spaces)
+            if (url.includes(' ') || !url.includes('.')) {
+                view.loadURL('https://www.google.com/search?q=' + encodeURIComponent(url));
+                return;
+            }
+
+            // Add protocol if missing
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                url = 'https://' + url;
+            }
+            view.loadURL(url);
+        };
+
+        // Search/Address Bar Events
+
+        // Focus/Blur Logic for Overlay and Smart URL
+        urlInput.addEventListener('focus', () => {
+            overlay.classList.add('active');
+            urlInput.value = currentFullUrl; // Show full URL on focus
+            urlInput.select();
+            showSuggestions(urlInput.value);
+        });
+
+        urlInput.addEventListener('blur', () => {
+            overlay.classList.remove('active');
+            // Show Title on blur, fallback to formatted URL
+            urlInput.value = currentTitle || formatUrl(currentFullUrl);
+            setTimeout(() => { suggestions.style.display = 'none'; }, 200); // Delay to allow click
+        });
+
+        urlInput.addEventListener('input', () => {
+            showSuggestions(urlInput.value);
+        });
+
+        const showSuggestions = (query) => {
+            if (!query) return;
+            suggestions.innerHTML = '';
+
+            // Mock Suggestions
+            const items = [
+                { text: `Search Google for "${query}"`, icon: '<circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>' },
+                { text: 'vasudev.online', icon: '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline>' },
+                { text: 'google.com', icon: '<circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>' }
+            ];
+
+            items.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'suggestion-item';
+                div.innerHTML = `
+                    <div class="suggestion-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${item.icon}</svg></div>
+                    <span>${item.text}</span>
+                `;
+                div.addEventListener('click', () => {
+                    if (item.text.startsWith('Search')) {
+                        loadUrl('https://google.com/search?q=' + query);
+                    } else {
+                        loadUrl(item.text);
+                    }
+                });
+                suggestions.appendChild(div);
+            });
+
+            suggestions.style.display = 'flex';
+        };
+
+        urlInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                loadUrl(urlInput.value);
+                urlInput.blur();
+                overlay.classList.remove('active');
+            }
+        });
+
+        searchBtn.addEventListener('click', () => {
+            loadUrl(urlInput.value);
+        });
+
+        // Navigation Buttons
+        homeBtn.addEventListener('click', () => {
+            view.src = 'home.html';
+        });
+
+        backBtn.addEventListener('click', () => {
+            if (view.canGoBack()) {
+                view.goBack();
+            }
+        });
+
+        forwardBtn.addEventListener('click', () => {
+            if (view.canGoForward()) {
+                view.goForward();
+            }
+        });
+
+        reloadBtn.addEventListener('click', () => {
+            view.reload();
+        });
+
+        // Update Address Bar on Navigate
+        view.addEventListener('did-navigate', (e) => {
+            currentFullUrl = e.url;
+            // Try to get title, fallback to formatted URL
+            currentTitle = view.getTitle();
+            if (!currentTitle) currentTitle = formatUrl(e.url);
+
+            if (document.activeElement !== urlInput) {
+                urlInput.value = currentTitle;
+            }
+
+            // Security Badge
+            if (e.url.startsWith('https://')) {
+                securityBadge.style.display = 'block';
+            } else {
+                securityBadge.style.display = 'none';
+            }
+
+            // Reset to google favicon service as a fallback
+            faviconImg.src = `https://www.google.com/s2/favicons?domain=${new URL(e.url).hostname}&sz=64`;
+        });
+
+        view.addEventListener('did-navigate-in-page', (e) => {
+            currentFullUrl = e.url;
+            currentTitle = view.getTitle();
+            if (document.activeElement !== urlInput) {
+                urlInput.value = currentTitle || formatUrl(e.url);
+            }
+        });
+
+        view.addEventListener('page-title-updated', (e) => {
+            currentTitle = e.title;
+            if (document.activeElement !== urlInput) {
+                urlInput.value = currentTitle;
+            }
+        });
+
+        // Loading Progress
+        view.addEventListener('did-start-loading', () => {
+            progressContainer.style.opacity = 1;
+            progressBar.style.width = '20%'; // Start
+            updateNavButtons();
+        });
+
+        view.addEventListener('did-stop-loading', () => {
+            progressBar.style.width = '100%';
+            setTimeout(() => {
+                progressContainer.style.opacity = 0;
+                setTimeout(() => { progressBar.style.width = '0%'; }, 200);
+            }, 500);
+            updateNavButtons();
+
+            // Trigger color update
+            setTimeout(updateBackgroundColor, 500);
+        }); const faviconImg = document.getElementById('favicon-img');
+        view.addEventListener('page-favicon-updated', (e) => {
+            if (e.favicons && e.favicons.length > 0) {
+                faviconImg.src = e.favicons[0];
+            }
+        });
+
+        // Fallback for favicon on navigation (using Google's service if direct favicon fails or for initial load)
+        view.addEventListener('did-navigate', (e) => {
+            // Reset to google favicon service as a fallback or primary source
+            faviconImg.src = `https://www.google.com/s2/favicons?domain=${new URL(e.url).hostname}&sz=64`;
+        });
+
+        // Dynamic Background Color Logic
+        const updateBackgroundColor = async () => {
+            try {
+                // Capture the top 100px of the page (header area)
+                const image = await view.capturePage({ x: 0, y: 0, width: view.offsetWidth, height: 100 });
+
+                // Resize to 1x1 to get the dominant/average color
+                const resized = image.resize({ width: 1, height: 1 });
+                const dataURL = resized.toDataURL();
+
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 1;
+                    canvas.height = 1;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+
+                    const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
+
+                    // Create a gradient based on this color
+                    const mainColor = `rgb(${r}, ${g}, ${b})`;
+                    const secondaryColor = `rgb(${Math.max(0, r - 40)}, ${Math.max(0, g - 40)}, ${Math.max(0, b - 40)})`;
+
+                    document.body.style.background = `linear-gradient(to bottom, ${mainColor}, ${secondaryColor})`;
+
+                    // Check brightness to adjust text color if needed
+                    const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+                    const isDark = brightness < 128;
+
+                    const textColor = isDark ? '#ffffff' : '#333333';
+                    const iconColor = isDark ? 'rgba(255,255,255,0.9)' : '#5f6368';
+                    const glassBg = isDark ? `rgba(${r}, ${g}, ${b}, 0.6)` : `rgba(${r}, ${g}, ${b}, 0.35)`;
+                    const dropdownBg = isDark ? '#1a1a1a' : '#ffffff';
+                    const hoverBg = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)';
+                    const borderColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
+
+                    // Apply CSS Variables for dynamic theming
+                    document.body.style.setProperty('--text-color', textColor);
+                    document.body.style.setProperty('--icon-color', iconColor);
+                    document.body.style.setProperty('--dropdown-bg', dropdownBg);
+                    document.body.style.setProperty('--hover-bg', hoverBg);
+                    document.body.style.setProperty('--border-color', borderColor);
+
+                    // Update Nav Icons
+                    document.querySelectorAll('.nav-btn').forEach(btn => {
+                        btn.style.color = iconColor;
+                    });
+
+                    // Update Search Icon
+                    searchBtn.style.color = iconColor;
+
+                    // Update backgrounds
+                    addressBar.style.background = glassBg;
+                    navControls.style.background = glassBg;
+                    winControls.style.background = glassBg;
+                    suggestions.style.background = dropdownBg;
+                    suggestions.style.borderColor = borderColor;
+                };
+                img.src = dataURL;
+
+            } catch (error) {
+                console.error('Failed to capture page color:', error);
+            }
+        };
+
+        // Update color when page finishes loading
+        view.addEventListener('did-finish-load', updateBackgroundColor);
+
+        // Also update after a short delay to ensure content is rendered
+        view.addEventListener('did-stop-loading', () => {
+            setTimeout(updateBackgroundColor, 500);
+        });
+
+        // Optional: Update buttons state
+        const updateNavButtons = () => {
+            backBtn.style.opacity = view.canGoBack() ? '1' : '0.5';
+            forwardBtn.style.opacity = view.canGoForward() ? '1' : '0.5';
+        };
+
+        view.addEventListener('did-start-loading', updateNavButtons);
+        view.addEventListener('did-stop-loading', updateNavButtons);
+
+    </script>
+</body>
+
 </html>
